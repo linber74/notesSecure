@@ -1,9 +1,12 @@
 package repository;
 
 import config.DatabaseConnection;
+import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserRepository {
@@ -26,6 +29,42 @@ public class UserRepository {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public User loginUser(String username, String password) {
+
+        if (username == null || username.isBlank())
+            return null;
+        if (password == null || password.isBlank())
+            return null;
+
+        try (Connection connection = DatabaseConnection.getConnection();
+        PreparedStatement stm = connection.prepareStatement("SELECT * FROM users WHERE username = ?");) {
+            stm.setString(1, username);
+
+            try (ResultSet rs = stm.executeQuery()){
+                if (rs.next()) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("userId"));
+                    user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
+                    user.setRole(rs.getString("role"));
+
+                    if (BCrypt.checkpw(password, user.getPassword())) {
+                        return user;
+                    }
+                    else  {
+                        return null;
+                    }
+                }
+                else {
+                    return null;
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

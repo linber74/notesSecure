@@ -1,5 +1,6 @@
 package service;
 
+import org.mindrot.jbcrypt.BCrypt;
 import repository.UserRepository;
 
 public class AuthService {
@@ -16,6 +17,8 @@ public class AuthService {
             System.out.println("Password is null or blank");
             return false;
         }
-        return userRepository.saveUser(username, password, "USER");
+
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        return userRepository.saveUser(username, hashedPassword, "USER");
     }
 }
