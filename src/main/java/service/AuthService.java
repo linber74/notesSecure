@@ -8,6 +8,9 @@ public class AuthService {
 
     private final UserRepository userRepository = new UserRepository();
 
+    private int loginAttempts = 0;
+    private static final int MAX_LOGIN_ATTEMPTS = 3;
+
     public boolean register(String username, String password) {
         if(username == null || username.isBlank()){
             System.out.println("Username is null or blank");
@@ -16,6 +19,10 @@ public class AuthService {
 
         if(password == null || password.isBlank()){
             System.out.println("Password is null or blank");
+            return false;
+        }
+        if (userRepository.findUsername(username)){
+            System.out.println("Username already exists");
             return false;
         }
 
@@ -32,6 +39,20 @@ public class AuthService {
             System.out.println("Password is null or blank");
             return null;
         }
-        return userRepository.loginUser(username, password);
+        if(loginAttempts >= MAX_LOGIN_ATTEMPTS){
+            System.out.println("Too many login attempts");
+            return null;
+        }
+
+        User user = userRepository.loginUser(username, password);
+
+        if(user == null){
+            System.out.println("Invalid username or password");
+            loginAttempts++;
+            return null;
+        }else {
+            loginAttempts = 0;
+            return user;
+        }
     }
 }
