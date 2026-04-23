@@ -1,29 +1,18 @@
 package config;
 
-import java.io.IOException;
-import java.io.InputStream;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class DatabaseConnection {
 
-    private static final Properties prop = new Properties();
+    private static final Dotenv dotenv = Dotenv.load();
 
-    static {
-        try (InputStream input = DatabaseConnection.class
-                .getClassLoader()
-                .getResourceAsStream("Settings.properties")) {
-            prop.load(input);
-        } catch (IOException e) {
-            throw new RuntimeException("Kunde inte ladda Settings.properties", e);
-        }
-    }
-
-    private static final String URL = prop.getProperty("db.url");
-    private static final String USER = prop.getProperty("db.user");
-    private static final String PASSWORD = prop.getProperty("db.password");
+    private static final String URL = dotenv.get("db_url");
+    private static final String USER = dotenv.get("db_user");
+    private static final String PASSWORD = dotenv.get("db_password");
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
