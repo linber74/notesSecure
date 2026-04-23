@@ -104,13 +104,9 @@ public class NotesRepository {
         }
     }
 
-    public List<Notes> getAllNotes(User currentUser) {
+    public List<Notes> getAllNotes() {
 
         String sql = "SELECT * FROM notes";
-
-        if(!Objects.equals(currentUser.getRole(), "Admin")){
-            return new ArrayList<>();
-        }
 
         try (Connection conn = DatabaseConnection.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
