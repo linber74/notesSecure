@@ -2,7 +2,6 @@ package repository;
 
 import config.DatabaseConnection;
 import model.Notes;
-import model.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,8 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 
 public class NotesRepository {
 
@@ -129,6 +126,22 @@ public class NotesRepository {
         }
     }
 
+    public boolean deleteNoteAdmin(int notesId) {
+        String sql = "DELETE FROM notes WHERE notesId = ?";
+        if (notesId == -1){
+            return false;
+        }
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, notesId);
+            int rows = stmt.executeUpdate();
+            return (rows > 0);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // Help function
     public Notes getNotesById(int notesId, int userId) {
 
@@ -146,7 +159,6 @@ public class NotesRepository {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Notes notes = new Notes();
-
                     notes.setNotesId(rs.getInt("notesId"));
                     notes.setText(rs.getString("text"));
                     notes.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());

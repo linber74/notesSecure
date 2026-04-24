@@ -45,4 +45,11 @@ public class NotesService {
         return notesRepository.getAllNotes();
     }
 
+    public boolean deleteNoteAdmin(User currentUser, int notesId) {
+        if (!Objects.equals(currentUser.getRole(), "Admin")){
+            return false;
+        }
+        return notesRepository.deleteNoteAdmin(notesId);
+    }
+
 }

@@ -123,8 +123,9 @@ public class ConsoleMenu {
             System.out.println("3. change notes");
             System.out.println("4. Delete notes");
             System.out.println("5. View all notes");
-            System.out.println("6. Change password");
-            System.out.println("7. logout");
+            System.out.println("6. Delete notes from other users");
+            System.out.println("7. Change password");
+            System.out.println("8. logout");
 
             String choice = scanner.nextLine();
             switch (choice) {
@@ -133,8 +134,9 @@ public class ConsoleMenu {
                 case "3" -> changeNotes();
                 case "4" -> deleteNotes();
                 case "5" -> getAllNotes();
-                case "6" -> updatePassword();
-                case "7" -> logout();
+                case "6" -> deleteNoteAdmin();
+                case "7" -> updatePassword();
+                case "8" -> logout();
                 default -> System.out.println("Invalid choice");
             }
         }
@@ -205,6 +207,25 @@ public class ConsoleMenu {
         }
     }
 
+    private void deleteNoteAdmin() {
+        List<Notes> notesList = notesService.getAllNotes(currentUser);
+        for (Notes note : notesList) {
+            System.out.println("User ID: " + note.getUserId() + " | " + "Note ID: " + note.getNotesId()
+                    + note.getCreatedAt() + ": " + note.getText());
+        }
+        System.out.println("What Note do you want to delete?: ");
+        int val = Integer.parseInt(scanner.nextLine());
+
+        success = notesService.deleteNoteAdmin(currentUser, val);
+        if (success) {
+            System.out.println("Note Deleted");
+        }
+        else {
+            System.out.println("Note Not Deleted");
+        }
+
+    }
+
     private void updatePassword() {
         System.out.println("What Password do you want?: ");
         String password = scanner.nextLine();
@@ -226,4 +247,5 @@ public class ConsoleMenu {
             System.out.println("Password Not Updated");
         }
     }
+
 }
