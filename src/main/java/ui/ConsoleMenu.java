@@ -1,21 +1,28 @@
 package ui;
 
+import model.Notes;
 import model.User;
 import service.AuthService;
+import service.NotesService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
 
 public class ConsoleMenu {
 
     private final Scanner scanner = new Scanner(System.in);
     private final AuthService service = new AuthService();
+    private final NotesService notesService = new NotesService();
     private User currentUser = null;
     private boolean running = true;
     private boolean userRunning = true;
+    private boolean success = false;
+    private final Notes note = new Notes();
+    private List<Notes> notes= new ArrayList<>();
 
     public void start() {
-
-
 
         while (running) {
             System.out.println("\n--- Secure note----");
@@ -41,7 +48,7 @@ public class ConsoleMenu {
         System.out.println("Enter password: ");
         String password = scanner.nextLine();
 
-        boolean success = service.register(username, password);
+        success = service.register(username, password);
         if (success) {
             System.out.println("User successfully registered");
         } else  {
@@ -58,7 +65,11 @@ public class ConsoleMenu {
         currentUser = service.login(username,password);
         if (currentUser != null) {
             System.out.println("Welcome " + currentUser.getUsername());
-            userMenu();
+            if(currentUser.getRole().equals("Admin")){
+                adminMenu();
+            } else {
+                userMenu();
+            }
         }
         else {
             System.out.println("Invalid username or password");
@@ -85,7 +96,8 @@ public class ConsoleMenu {
             System.out.println("2. View my notes");
             System.out.println("3. change notes");
             System.out.println("4. Delete notes");
-            System.out.println("5. logout");
+            System.out.println("5. Change password");
+            System.out.println("6. logout");
 
             String choice = scanner.nextLine();
             switch (choice) {
@@ -93,9 +105,103 @@ public class ConsoleMenu {
                 case "2" -> viewNotes();
                 case "3" -> changeNotes();
                 case "4" -> deleteNotes();
-                case "5" -> logout();
+                case "5" -> updatePassword();
+                case "6" -> logout();
                 default -> System.out.println("Invalid choice");
             }
+        }
+    }
+
+    private void adminMenu() {
+
+        userRunning = true;
+
+        while (userRunning) {
+            System.out.println("\n--- Admin menu----");
+            System.out.println("1. create note");
+            System.out.println("2. View my notes");
+            System.out.println("3. change notes");
+            System.out.println("4. Delete notes");
+            System.out.println("5. View all notes");
+            System.out.println("6. Change password");
+            System.out.println("7. logout");
+
+            String choice = scanner.nextLine();
+            switch (choice) {
+                case "1" -> createNotes();
+                case "2" -> viewNotes();
+                case "3" -> changeNotes();
+                case "4" -> deleteNotes();
+                case "5" -> getAllNotes();
+                case "6" -> updatePassword();
+                case "7" -> logout();
+                default -> System.out.println("Invalid choice");
+            }
+        }
+    }
+
+    private void createNotes() {
+        System.out.println("Write Note: ");
+        String text = scanner.nextLine();
+
+        success = notesService.createNotes(text, currentUser.getUserId());
+        if (success) {
+            System.out.println("Note Saved");
+        }else {
+            System.out.println("Note Not Saved");
+        }
+    }
+
+    private void viewNotes() {
+        notes =notesService.viewNotes(currentUser.getUserId());
+        int nr = 1;
+        if (notes.isEmpty()) {
+            System.out.println("No notes found");
+        } else {
+            for (Notes note : notes) {
+                System.out.println(nr++ +" | " + note.getCreatedAt() + ": " + note.getText());
+            }
+        }
+    }
+
+    private void changeNotes() {
+        viewNotes();
+        System.out.println("What Note do you want to change?: ");
+        int val = Integer.parseInt(scanner.nextLine());
+
+        System.out.println("Change Note: ");
+        String newText = scanner.nextLine();
+
+        success = notesService.updateNotes(notes.get(val - 1).getNotesId(),
+                newText, currentUser.getUserId());
+
+        if (success) {
+            System.out.println("Note Updated");
+        }
+        else {
+            System.out.println("Note Not Updated");
+        }
+    }
+
+    private void deleteNotes() {
+        viewNotes();
+        System.out.println("What Note do you want to delete?: ");
+        int val = Integer.parseInt(scanner.nextLine());
+
+        success = notesService.deleteNotes(notes.get(val - 1).getNotesId(), currentUser.getUserId());
+        if (success) {
+            System.out.println("Note Deleted");
+        }
+        else {
+            System.out.println("Note Not Deleted");
+        }
+    }
+
+    private void getAllNotes() {
+        List<Notes> notesList = notesService.getAllNotes(currentUser);
+
+        for (Notes note : notesList) {
+            System.out.println("User ID: " + note.getUserId() + " | " + note.getCreatedAt() + ": " + note.getText());
         }
     }
 }
