@@ -82,4 +82,21 @@ public class UserRepository {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean updatePassword(String username, String password) {
+
+        String sql = "UPDATE users SET password = ? WHERE username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setString(1, password);
+            stmt.setString(2, username);
+
+            int rows = stmt.executeUpdate();
+            return (rows > 0);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

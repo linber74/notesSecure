@@ -55,4 +55,14 @@ public class AuthService {
             return user;
         }
     }
+
+    public boolean updatePassword (String username, String password) {
+        if(password == null || password.isBlank()){
+            System.out.println("Password is null or blank");
+            return false;
+        }
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
+        return userRepository.updatePassword(username, hashedPassword);
+    }
 }

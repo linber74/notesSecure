@@ -204,4 +204,26 @@ public class ConsoleMenu {
             System.out.println("User ID: " + note.getUserId() + " | " + note.getCreatedAt() + ": " + note.getText());
         }
     }
+
+    private void updatePassword() {
+        System.out.println("What Password do you want?: ");
+        String password = scanner.nextLine();
+
+        System.out.println("Confirm Password: ");
+        String confirmPassword = scanner.nextLine();
+
+        if (!password.equals(confirmPassword)) {
+            System.out.println("Passwords do not match");
+            return;
+        }
+
+        success = service.updatePassword(currentUser.getUsername(), password);
+
+        if (success) {
+            System.out.println("Password Updated");
+        }
+        else {
+            System.out.println("Password Not Updated");
+        }
+    }
 }
