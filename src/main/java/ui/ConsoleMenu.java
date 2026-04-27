@@ -23,6 +23,7 @@ public class ConsoleMenu {
     private boolean success = false;
     private List<Notes> notes= new ArrayList<>();
     private static final Logger logger = LoggerConfig.getLogger();
+    private List <Notes> notesList = new ArrayList<>();
 
     public void start() {
 
@@ -47,6 +48,8 @@ public class ConsoleMenu {
         System.out.println("Enter username (min 3 character or max 25 character): ");
         String username = scanner.nextLine();
 
+        System.out.println("Password must contain: min 8 characters, 1 uppercase, " +
+                "1 lowercase, 1 digit, 1 special character (!@#$&*:;)");
         System.out.println("Enter password: ");
         String password = scanner.nextLine();
 
@@ -241,7 +244,7 @@ public class ConsoleMenu {
     private void getAllNotes() {
 
         try {
-            List<Notes> notesList = notesService.getAllNotes(currentUser);
+            notesList = notesService.getAllNotes(currentUser);
 
             for (Notes note : notesList) {
                 System.out.println("User ID: " + note.getUserId() + " | " + note.getCreatedAt() + ": " + note.getText());
@@ -253,7 +256,12 @@ public class ConsoleMenu {
     }
 
     private void deleteNoteAdmin() {
-        List<Notes> notesList = notesService.getAllNotes(currentUser);
+        try {
+           notesList = notesService.getAllNotes(currentUser);
+        } catch (RuntimeException e) {
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
+        }
         for (Notes note : notesList) {
             System.out.println("User ID: " + note.getUserId() + " | " + "Note ID: " + note.getNotesId()
                     + note.getCreatedAt() + ": " + note.getText());
@@ -277,7 +285,10 @@ public class ConsoleMenu {
     }
 
     private void updatePassword() {
+        System.out.println("Password must contain: min 8 characters, 1 uppercase, " +
+                "1 lowercase, 1 digit, 1 special character (!@#$&*:;)");
         System.out.println("What Password do you want?: ");
+
         String password = scanner.nextLine();
 
         System.out.println("Confirm Password: ");
