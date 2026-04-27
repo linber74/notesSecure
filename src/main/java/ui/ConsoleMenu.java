@@ -1,5 +1,6 @@
 package ui;
 
+import config.LoggerConfig;
 import model.Notes;
 import model.User;
 import service.AuthService;
@@ -8,6 +9,7 @@ import service.NotesService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 
 public class ConsoleMenu {
@@ -19,8 +21,8 @@ public class ConsoleMenu {
     private boolean running = true;
     private boolean userRunning = true;
     private boolean success = false;
-    private final Notes note = new Notes();
     private List<Notes> notes= new ArrayList<>();
+    private static final Logger logger = LoggerConfig.getLogger();
 
     public void start() {
 
@@ -48,7 +50,12 @@ public class ConsoleMenu {
         System.out.println("Enter password: ");
         String password = scanner.nextLine();
 
-        success = service.register(username, password);
+        try {
+            success = service.register(username, password);
+        }catch (RuntimeException e){
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
+        }
         password = null;
         if (success) {
             System.out.println("User successfully registered");
@@ -65,7 +72,12 @@ public class ConsoleMenu {
         System.out.println("Enter password: ");
         String password = scanner.nextLine();
 
-        currentUser = service.login(username,password);
+        try {
+            currentUser = service.login(username, password);
+        }catch (RuntimeException e){
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
+        }
         password = null;
         if (currentUser != null) {
             System.out.println("Welcome " + currentUser.getUsername());
@@ -150,7 +162,13 @@ public class ConsoleMenu {
         System.out.println("Write Note: ");
         String text = scanner.nextLine();
 
-        success = notesService.createNotes(text, currentUser.getUserId());
+        try {
+            success = notesService.createNotes(text, currentUser.getUserId());
+        }catch (RuntimeException e){
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
+        }
+
         if (success) {
             System.out.println("Note Saved");
         }else {
@@ -159,14 +177,20 @@ public class ConsoleMenu {
     }
 
     private void viewNotes() {
-        notes =notesService.viewNotes(currentUser.getUserId());
-        int nr = 1;
-        if (notes.isEmpty()) {
-            System.out.println("No notes found");
-        } else {
-            for (Notes note : notes) {
-                System.out.println(nr++ +" | " + note.getCreatedAt() + ": " + note.getText());
+
+        try {
+            notes = notesService.viewNotes(currentUser.getUserId());
+            int nr = 1;
+            if (notes.isEmpty()) {
+                System.out.println("No notes found");
+            } else {
+                for (Notes note : notes) {
+                    System.out.println(nr++ + " | " + note.getCreatedAt() + ": " + note.getText());
+                }
             }
+        } catch (RuntimeException e){
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
         }
     }
 
@@ -178,8 +202,13 @@ public class ConsoleMenu {
         System.out.println("Change Note: ");
         String newText = scanner.nextLine();
 
-        success = notesService.updateNotes(notes.get(val - 1).getNotesId(),
-                newText, currentUser.getUserId());
+        try {
+            success = notesService.updateNotes(notes.get(val - 1).getNotesId(),
+                    newText, currentUser.getUserId());
+        } catch (RuntimeException e){
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
+        }
 
         if (success) {
             System.out.println("Note Updated");
@@ -194,7 +223,13 @@ public class ConsoleMenu {
         System.out.println("What Note do you want to delete?: ");
         int val = Integer.parseInt(scanner.nextLine());
 
-        success = notesService.deleteNotes(notes.get(val - 1).getNotesId(), currentUser.getUserId());
+        try {
+            success = notesService.deleteNotes(notes.get(val - 1).getNotesId(), currentUser.getUserId());
+        } catch (RuntimeException e) {
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
+        }
+
         if (success) {
             System.out.println("Note Deleted");
         }
@@ -204,10 +239,16 @@ public class ConsoleMenu {
     }
 
     private void getAllNotes() {
-        List<Notes> notesList = notesService.getAllNotes(currentUser);
 
-        for (Notes note : notesList) {
-            System.out.println("User ID: " + note.getUserId() + " | " + note.getCreatedAt() + ": " + note.getText());
+        try {
+            List<Notes> notesList = notesService.getAllNotes(currentUser);
+
+            for (Notes note : notesList) {
+                System.out.println("User ID: " + note.getUserId() + " | " + note.getCreatedAt() + ": " + note.getText());
+            }
+        }catch (RuntimeException e){
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
         }
     }
 
@@ -220,7 +261,13 @@ public class ConsoleMenu {
         System.out.println("What Note do you want to delete?: ");
         int val = Integer.parseInt(scanner.nextLine());
 
-        success = notesService.deleteNoteAdmin(currentUser, val);
+        try {
+            success = notesService.deleteNoteAdmin(currentUser, val);
+        } catch (RuntimeException e){
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
+        }
+
         if (success) {
             System.out.println("Note Deleted");
         }
@@ -240,8 +287,13 @@ public class ConsoleMenu {
             System.out.println("Passwords do not match");
             return;
         }
+        try {
+            success = service.updatePassword(currentUser.getUsername(), password);
+        } catch (RuntimeException e) {
+            logger.severe(e.getMessage());
+            System.out.println("Something went wrong, please try again");
+        }
 
-        success = service.updatePassword(currentUser.getUsername(), password);
         password = null;
 
         if (success) {

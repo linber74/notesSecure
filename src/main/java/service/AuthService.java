@@ -44,7 +44,7 @@ public class AuthService {
         }
 
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        return userRepository.saveUser(username, hashedPassword, "USER");
+        return userRepository.saveUser(username, hashedPassword, "User");
     }
 
     public User login (String username, String password) {
@@ -151,9 +151,10 @@ public class AuthService {
         char [] passwordArray = {'!', '@', '#', '$', '&', '*', ':', ';'};
 
         for(int i = 0; i < password.length(); i++){
-            for(int j = 0; j < passwordArray.length; j++){
-                if(passwordArray[j] == password.charAt(i)){
+            for (char c : passwordArray) {
+                if (c == password.charAt(i)) {
                     hasSpecial = true;
+                    break;
                 }
             }
         }

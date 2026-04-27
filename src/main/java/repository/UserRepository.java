@@ -1,6 +1,7 @@
 package repository;
 
 import config.DatabaseConnection;
+import config.LoggerConfig;
 import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -8,9 +9,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Objects;
+import java.util.logging.Logger;
 
 public class UserRepository {
+
+    private static final Logger logger = LoggerConfig.getLogger();
 
     public boolean findUsername(String username) {
         String sql = "SELECT username FROM users WHERE username = ?";
@@ -42,7 +45,7 @@ public class UserRepository {
             return (rows > 0);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe(e.getMessage());
             return false;
         }
     }
@@ -55,7 +58,7 @@ public class UserRepository {
             return null;
 
         try (Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement stm = connection.prepareStatement("SELECT * FROM users WHERE username = ?");) {
+        PreparedStatement stm = connection.prepareStatement("SELECT * FROM users WHERE username = ?")) {
             stm.setString(1, username);
 
             try (ResultSet rs = stm.executeQuery()){

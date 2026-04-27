@@ -1,5 +1,6 @@
 package config;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -12,7 +13,9 @@ public class LoggerConfig {
             (LoggerConfig.class.getName());
 
     static {
-        FileHandler fileHandler = null;
+        logger.setUseParentHandlers(false);
+        boolean ignored = new File("logs").mkdirs();
+        FileHandler fileHandler;
         try {
             fileHandler = new FileHandler("logs/app.log", true);
         } catch (IOException e) {

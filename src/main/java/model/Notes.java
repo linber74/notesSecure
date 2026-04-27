@@ -9,7 +9,6 @@ public class Notes {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private int userId;
-
     public Notes(){}
 
     public int getNotesId() {
@@ -31,6 +30,7 @@ public class Notes {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
