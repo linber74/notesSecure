@@ -22,7 +22,7 @@ public class LoggerConfig {
         logger.addHandler(fileHandler);
     }
 
-    static Logger getLogger() {
+    public static Logger getLogger() {
         return logger;
     }
 

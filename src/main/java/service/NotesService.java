@@ -17,6 +17,10 @@ public class NotesService {
             System.out.println("Notes can't be empty");
             return false;
         }
+        if (text.length() > 500) {
+            System.out.println("Notes can't be longer than 500 characters");
+            return false;
+        }
         return notesRepository.saveNote(text, userId);
     }
 

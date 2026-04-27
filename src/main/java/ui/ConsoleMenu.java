@@ -42,19 +42,22 @@ public class ConsoleMenu {
     }
 
     private void register() {
-        System.out.println("Enter username: ");
+        System.out.println("Enter username (min 3 character or max 25 character): ");
         String username = scanner.nextLine();
 
         System.out.println("Enter password: ");
         String password = scanner.nextLine();
 
         success = service.register(username, password);
+        password = null;
         if (success) {
             System.out.println("User successfully registered");
+
         } else  {
             System.out.println("Could not save user");
         }
     }
+
 
     private void login() {
         System.out.println("Enter username: ");
@@ -63,6 +66,7 @@ public class ConsoleMenu {
         String password = scanner.nextLine();
 
         currentUser = service.login(username,password);
+        password = null;
         if (currentUser != null) {
             System.out.println("Welcome " + currentUser.getUsername());
             if(currentUser.getRole().equals("Admin")){
@@ -223,7 +227,6 @@ public class ConsoleMenu {
         else {
             System.out.println("Note Not Deleted");
         }
-
     }
 
     private void updatePassword() {
@@ -239,6 +242,7 @@ public class ConsoleMenu {
         }
 
         success = service.updatePassword(currentUser.getUsername(), password);
+        password = null;
 
         if (success) {
             System.out.println("Password Updated");
