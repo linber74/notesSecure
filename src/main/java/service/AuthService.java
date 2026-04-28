@@ -67,7 +67,6 @@ public class AuthService {
         User user = userRepository.loginUser(username, password);
 
         if(user == null){
-            System.out.println("Invalid username or password");
             loginAttempts++;
             logger.warning("Invalid username or password");
             return null;

@@ -202,7 +202,9 @@ public class ConsoleMenu {
         System.out.println("What Note do you want to change?: ");
         int val = Integer.parseInt(scanner.nextLine());
 
+        System.out.println("Current Note: " + notes.get(val-1).getText());
         System.out.println("Change Note: ");
+
         String newText = scanner.nextLine();
 
         try {
@@ -242,12 +244,12 @@ public class ConsoleMenu {
     }
 
     private void getAllNotes() {
-
+        int nr = 1;
         try {
             notesList = notesService.getAllNotes(currentUser);
 
             for (Notes note : notesList) {
-                System.out.println("User ID: " + note.getUserId() + " | " + note.getCreatedAt() + ": " + note.getText());
+                System.out.println(nr++ + ": " + "User ID: " + note.getUserId() + " | " + note.getCreatedAt() + ": " + note.getText());
             }
         }catch (RuntimeException e){
             logger.severe(e.getMessage());
@@ -256,21 +258,13 @@ public class ConsoleMenu {
     }
 
     private void deleteNoteAdmin() {
-        try {
-           notesList = notesService.getAllNotes(currentUser);
-        } catch (RuntimeException e) {
-            logger.severe(e.getMessage());
-            System.out.println("Something went wrong, please try again");
-        }
-        for (Notes note : notesList) {
-            System.out.println("User ID: " + note.getUserId() + " | " + "Note ID: " + note.getNotesId()
-                    + note.getCreatedAt() + ": " + note.getText());
-        }
+        getAllNotes();
+
         System.out.println("What Note do you want to delete?: ");
         int val = Integer.parseInt(scanner.nextLine());
 
         try {
-            success = notesService.deleteNoteAdmin(currentUser, val);
+            success = notesService.deleteNoteAdmin(currentUser, notesList.get(val-1).getNotesId());
         } catch (RuntimeException e){
             logger.severe(e.getMessage());
             System.out.println("Something went wrong, please try again");
